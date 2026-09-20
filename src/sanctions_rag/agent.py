@@ -11,7 +11,8 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass, field
 
-from .rag import Answer, Evidence, answer as rag_answer, gather
+from .rag import Evidence, gather
+from .rag import answer as rag_answer
 
 STOPWORDS = {
     "who", "what", "which", "where", "when", "why", "how", "is", "are", "the", "a", "an",

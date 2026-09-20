@@ -35,5 +35,5 @@ def test_critique_asks_for_missing_subquery():
 
 def test_critique_passes_when_all_covered():
     ev = [_ev("Gazprombank"), _ev("Rosneft holding"), _ev("Transneft group")]
-    ok, reason, follow = critique("x", ev, ["Gazprombank", "Rosneft"])
+    ok, _reason, follow = critique("x", ev, ["Gazprombank", "Rosneft"])
     assert ok and follow == []

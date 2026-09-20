@@ -10,7 +10,7 @@ class VectorIndex:
         self.doc_ids: list[str] = []
         self.matrix: np.ndarray | None = None
 
-    def index(self, docs: list[tuple[str, str]]) -> "VectorIndex":
+    def index(self, docs: list[tuple[str, str]]) -> VectorIndex:
         self.doc_ids = [d for d, _ in docs]
         texts = [t for _, t in docs]
         self.encoder.fit(texts)

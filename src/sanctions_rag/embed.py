@@ -48,8 +48,7 @@ class LSAEncoder:
                 rows.append(i); cols.append(j); vals.append(v)
         return sparse.csr_matrix((vals, (rows, cols)), shape=(len(texts), len(self.vocab)), dtype=np.float32)
 
-    def fit(self, texts: list[str]) -> "LSAEncoder":
-        from scipy import sparse
+    def fit(self, texts: list[str]) -> LSAEncoder:
         from scipy.sparse.linalg import svds
 
         df: dict[str, int] = {}

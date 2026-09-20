@@ -22,7 +22,7 @@ class Pipeline:
     graph: GraphExpander
 
     @classmethod
-    def build(cls, db: str = "data/sanctions.db", dsn: str | None = None) -> "Pipeline":
+    def build(cls, db: str = "data/sanctions.db", dsn: str | None = None) -> Pipeline:
         store = Store(db, dsn)
         docs = [(e.id, e.search_text) for e in store.iter_entities()]
         bm25 = BM25().index(docs)

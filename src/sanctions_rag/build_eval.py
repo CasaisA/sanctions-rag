@@ -88,8 +88,7 @@ def main() -> None:
     rows = build(Store(args.db), args.per_family)
     Path(args.out).parent.mkdir(parents=True, exist_ok=True)
     with open(args.out, "w", encoding="utf-8") as fh:
-        for r in rows:
-            fh.write(json.dumps(r, ensure_ascii=False) + "\n")
+        fh.writelines(json.dumps(r, ensure_ascii=False) + "\n" for r in rows)
     print(f"{len(rows)} queries -> {args.out}")
 
 

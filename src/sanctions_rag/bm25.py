@@ -17,7 +17,7 @@ class BM25:
         self.postings: dict[str, list[int]] = defaultdict(list)
         self.avgdl = 0.0
 
-    def index(self, docs: list[tuple[str, str]]) -> "BM25":
+    def index(self, docs: list[tuple[str, str]]) -> BM25:
         """docs: list of (entity_id, searchable_text)."""
         for doc_id, text in docs:
             toks = tokenize(text)

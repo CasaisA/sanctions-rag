@@ -46,13 +46,35 @@ jobs:
     needs: test
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12", cache: pip }
+      - name: Build a small index so the smoke test hits real data
+        run: |
+          pip install -e .
+          mkdir -p data/raw
+          curl -fsSL "$(python3 -c "
+          import json,urllib.request
+          idx=json.load(urllib.request.urlopen('https://data.opensanctions.org/datasets/latest/index.json'))
+          print(next(r['url'] for d in idx['datasets'] if d['name']=='us_ofac_cons'
+                     for r in d['resources'] if r['name']=='entities.ftm.json'))")" \
+            -o data/raw/us_ofac_cons.jsonl
+          python -m sanctions_rag.ingest data/raw/us_ofac_cons.jsonl --db data/sanctions.db
       - uses: docker/setup-buildx-action@v3
       - name: Build image
         uses: docker/build-push-action@v5
-        with: { context: ., push: false, tags: "sanctions-rag:ci", cache-from: "type=gha", cache-to: "type=gha,mode=max" }
+        with:
+          context: .
+          push: false
+          load: true            # make the image available to the local daemon
+          tags: "sanctions-rag:ci"
+          cache-from: "type=gha"
+          cache-to: "type=gha,mode=max"
       - name: Smoke test the container
         run: |
           docker run -d --name api -p 8000:8000 -v "$PWD/data:/data:ro" sanctions-rag:ci
-          for i in $(seq 1 30); do curl -sf localhost:8000/health && break || sleep 5; done
-          curl -sf "localhost:8000/search?q=Gazprombank&k=3" | head -c 400
+          for _ in $(seq 1 40); do curl -sf localhost:8000/health >/dev/null && break || sleep 5; done
+          curl -sf localhost:8000/health | tee /dev/stderr | grep -q '"status":"ok"'
+          curl -sf "localhost:8000/search?q=Bank&k=3" | tee /dev/stderr | grep -q '"caption"'
+          curl -sf localhost:8000/metrics | grep -q sanctions_rag_
+          docker logs api | tail -5
           docker rm -f api

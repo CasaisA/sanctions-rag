@@ -24,11 +24,18 @@ for d in idx.get('datasets',[]):
 ")
   [ -n "$url" ] || { echo "no artefact for $name"; return 1; }
   echo "  $name <- $url"
+  local out="data/raw/${name}.jsonl"
   if [ "$limit" -gt 0 ]; then
-    curl -fsSL "$url" | head -n "$limit" > "data/raw/${name}.jsonl"
+    # head closes the pipe once it has its lines, so curl dies with SIGPIPE and exit 23.
+    # That is the expected way to take a slice, not a failure: disable pipefail around it
+    # and check the result instead.
+    set +o pipefail
+    curl -fsSL "$url" | head -n "$limit" > "$out"
+    set -o pipefail
   else
-    curl -fsSL "$url" -o "data/raw/${name}.jsonl"
+    curl -fsSL "$url" -o "$out"
   fi
+  [ -s "$out" ] || { echo "empty download for $name"; return 1; }
 }
 
 fetch us_ofac_cons 0

@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+.venv/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.DS_Store
+
+# Bulk data and build artefacts: regenerate with scripts/fetch_data.sh + ingest
+data/raw/*.jsonl
+data/sanctions.db

@@ -1,0 +1,28 @@
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: sanctions
+      POSTGRES_PASSWORD: sanctions
+      POSTGRES_DB: sanctions
+    ports: ["5432:5432"]
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sanctions"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  api:
+    build: .
+    depends_on:
+      db: { condition: service_healthy }
+    environment:
+      SANCTIONS_RAG_DSN: postgresql://sanctions:sanctions@db:5432/sanctions
+    ports: ["8000:8000"]
+    volumes:
+      - ./data:/data:ro
+
+volumes:
+  pgdata:

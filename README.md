@@ -139,6 +139,8 @@ with a bounded BFS.
 | HTTP | `GET /search`, `POST /ask`, `POST /investigate`, `GET /link`, `GET /entity/{id}`, `GET /health` |
 | Container | `Dockerfile` (non-root, healthcheck), `docker-compose.yml` (API + Postgres) |
 | Kubernetes | `k8s/deployment.yaml` — 2 replicas, startup/readiness/liveness probes, DSN from a secret |
+| CI | GitHub Actions: lint, tests, **retrieval quality gate**, container build + smoke test |
+| Observability | JSON logs with request ids and per-stage timings, `/metrics` in Prometheus format |
 
 ## Optional extras
 
@@ -149,10 +151,23 @@ ANTHROPIC_API_KEY=...                         # LLM writes the prose over the sa
 SANCTIONS_RAG_DSN=postgresql://...            # Postgres instead of SQLite
 ```
 
+## Evaluation as a build step
+
+Retrieval quality is treated like a test. `eval_baseline.json` is committed; CI rebuilds
+the index from a fresh data slice, re-runs the 300 queries and fails the build if any
+system drops more than 0.02 below its baseline, or if `hybrid+rerank` stops being the
+best system by recall@10. A ranking change therefore has to update the baseline in the
+pull request, where a human can see the trade.
+
+```bash
+make eval gate        # locally: rebuild metrics, then enforce thresholds
+```
+
 ## Tests
 
 ```bash
-pytest          # 12 tests: normalisation, BM25, RRF, store/graph, planner, critic
+make test       # 18 tests: normalisation, BM25, RRF, store/graph, planner, critic,
+                #           quality gate, metrics rendering
 ```
 
 ## What this is not

@@ -4,10 +4,13 @@ from __future__ import annotations
 import os
 from typing import Any
 
-from fastapi import FastAPI, HTTPException, Query
+import time
+
+from fastapi import FastAPI, HTTPException, Query, Request, Response
 from pydantic import BaseModel, Field
 
 from .agent import investigate, link
+from .observability import METRICS, configure_logging, log, new_request_id, stage
 from .pipeline import Pipeline
 from .rag import answer as rag_answer
 
@@ -48,9 +51,32 @@ class InvestigateRequest(AskRequest):
     max_iterations: int = Field(default=3, ge=1, le=6)
 
 
+@app.middleware("http")
+async def observe(request: Request, call_next):
+    rid = new_request_id()
+    t0 = time.perf_counter()
+    response = await call_next(request)
+    dt = time.perf_counter() - t0
+    METRICS.observe("http_request", dt)
+    METRICS.count("http_request", f"{request.method} {request.url.path}")
+    METRICS.count("http_status", str(response.status_code))
+    log.info("request", extra={"extra_fields": {"method": request.method, "path": request.url.path,
+                                                "status": response.status_code,
+                                                "duration_ms": round(dt * 1000, 2)}})
+    response.headers["x-request-id"] = rid
+    return response
+
+
+@app.get("/metrics", response_class=Response)
+def metrics() -> Response:
+    return Response(METRICS.render(), media_type="text/plain; version=0.0.4")
+
+
 @app.on_event("startup")
 def _warm() -> None:
-    get_pipeline()
+    configure_logging()
+    with stage("index_build"):
+        get_pipeline()
 
 
 @app.get("/health")
@@ -63,7 +89,9 @@ def health() -> dict[str, Any]:
 def search(q: str = Query(min_length=2), k: int = Query(10, ge=1, le=50), expand: bool = False):
     p = get_pipeline()
     out = []
-    for doc_id, score in p.search(q, k=k, expand=expand):
+    with stage("retrieve", query_len=len(q), k=k, expand=expand):
+        hits = p.search(q, k=k, expand=expand)
+    for doc_id, score in hits:
         e = p.store.get(doc_id)
         if e is None:
             continue

@@ -1,0 +1,37 @@
+{
+  "overall": {
+    "bm25": {
+      "recall@1": 0.75,
+      "recall@5": 0.833,
+      "recall@10": 0.85,
+      "recall@20": 0.863,
+      "mrr@10": 0.782,
+      "ndcg@10": 0.798
+    },
+    "vector": {
+      "recall@1": 0.44,
+      "recall@5": 0.627,
+      "recall@10": 0.667,
+      "recall@20": 0.72,
+      "mrr@10": 0.515,
+      "ndcg@10": 0.552
+    },
+    "hybrid-rrf": {
+      "recall@1": 0.64,
+      "recall@5": 0.757,
+      "recall@10": 0.803,
+      "recall@20": 0.86,
+      "mrr@10": 0.692,
+      "ndcg@10": 0.718
+    },
+    "hybrid+rerank": {
+      "recall@1": 0.763,
+      "recall@5": 0.867,
+      "recall@10": 0.907,
+      "recall@20": 0.933,
+      "mrr@10": 0.808,
+      "ndcg@10": 0.832
+    }
+  },
+  "note": "committed baseline; update deliberately in a PR"
+}

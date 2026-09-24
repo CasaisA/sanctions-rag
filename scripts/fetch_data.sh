@@ -1,17 +1,31 @@
 #!/usr/bin/env bash
 # Download a bounded slice of OpenSanctions into data/raw/.
-# The index lists every dataset with a versioned artefact URL, so resolve it at runtime
-# rather than hardcoding a build that will 404 next week.
+# By default fetch the pinned versions that eval_baseline.json was measured on, so the CI
+# quality gate measures code changes, not upstream data changes. OPENSANCTIONS_LATEST=1
+# resolves the newest versions from the index instead (then re-baseline).
 set -euo pipefail
 cd "$(dirname "$0")/.."
 mkdir -p data/raw
 
 INDEX=$(mktemp)
-curl -fsSL "https://data.opensanctions.org/datasets/latest/index.json" -o "$INDEX"
+if [ "${OPENSANCTIONS_LATEST:-0}" = 1 ]; then
+  curl -fsSL "https://data.opensanctions.org/datasets/latest/index.json" -o "$INDEX"
+fi
+
+pinned () {  # pinned <dataset> -> version the baseline was measured on
+  case "$1" in
+    us_ofac_cons)   echo 20260920223501-krw ;;
+    gb_hmt_invbans) echo 20260920185601-kko ;;
+    us_ofac_sdn)    echo 20260920221915-jzv ;;
+  esac
+}
 
 fetch () {  # fetch <dataset> <max_lines>
   local name="$1" limit="${2:-0}"
   local url
+  if [ "${OPENSANCTIONS_LATEST:-0}" != 1 ]; then
+    url="https://data.opensanctions.org/artifacts/$name/$(pinned "$name")/entities.ftm.json"
+  else
   url=$(python3 -c "
 import json,sys
 idx=json.load(open('$INDEX'))
@@ -22,6 +36,7 @@ for d in idx.get('datasets',[]):
                 print(r.get('url') or ''); break
         break
 ")
+  fi
   [ -n "$url" ] || { echo "no artefact for $name"; return 1; }
   echo "  $name <- $url"
   local out="data/raw/${name}.jsonl"

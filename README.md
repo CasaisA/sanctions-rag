@@ -10,6 +10,12 @@ non-SDN, UK HMT investment bans), loaded as FollowTheMoney entities and relation
 Corpus as evaluated: **19,588 entities and 1,463 relations**, of which 1,446 are ownership
 edges.
 
+Data licence: OpenSanctions data is published under
+[CC BY-NC 4.0](https://www.opensanctions.org/licensing/) (non-commercial use, with
+attribution). This repository does not ship the raw data; `scripts/fetch_data.sh` downloads
+it from OpenSanctions. The evaluation queries in `data/eval/` are derived from it and carry
+the same licence.
+
 ## Quickstart
 
 ```bash
@@ -166,7 +172,7 @@ make eval gate        # locally: rebuild metrics, then enforce thresholds
 ## Tests
 
 ```bash
-make test       # 18 tests: normalisation, BM25, RRF, store/graph, planner, critic,
+make test       # 19 tests: normalisation, BM25, RRF, store/graph, planner, critic,
                 #           quality gate, metrics rendering
 ```
 

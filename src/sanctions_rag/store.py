@@ -71,7 +71,9 @@ class Store:
             self.ph = "%s"
         else:
             Path(path).parent.mkdir(parents=True, exist_ok=True)
-            self.conn = sqlite3.connect(str(path))
+            # The API opens the store at startup and FastAPI serves sync endpoints from a thread pool,
+            # so the connection must be usable across threads. Serving is read-only.
+            self.conn = sqlite3.connect(str(path), check_same_thread=False)
             self.conn.row_factory = sqlite3.Row
             self.ph = "?"
 

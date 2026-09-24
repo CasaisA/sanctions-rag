@@ -60,3 +60,22 @@ def test_store_roundtrip_and_neighbours(store):
     nb = store.neighbours("e1")
     assert ("e2", "Ownership", "out") in nb
     assert store.get("missing") is None
+
+
+def test_store_usable_from_another_thread(store):
+    # The API builds the store at startup and serves requests from a thread pool.
+    import sqlite3
+    import threading
+
+    errors = []
+
+    def read():
+        try:
+            store.conn.execute("SELECT count(*) FROM entities").fetchone()
+        except sqlite3.ProgrammingError as exc:  # pragma: no cover - only on regression
+            errors.append(exc)
+
+    t = threading.Thread(target=read)
+    t.start()
+    t.join()
+    assert not errors

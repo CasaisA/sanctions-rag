@@ -34,9 +34,12 @@ def _noise(name: str, rng: random.Random) -> str:
     return "".join(chars)
 
 
-def build(store: Store, per_family: int = 75, seed: int = 20260920) -> list[dict]:
+def build(store: Store, per_family: int = 75, seed: int = 20260920,
+          exclude: set[str] | None = None) -> list[dict]:
+    """exclude: entity ids to leave out, so a training set never shares entities with the test set."""
     rng = random.Random(seed)
-    ents = [e for e in store.iter_entities() if e.schema in ("Person", "Organization", "Company")]
+    ents = [e for e in store.iter_entities()
+            if e.schema in ("Person", "Organization", "Company") and e.id not in (exclude or set())]
     rng.shuffle(ents)
     out: list[dict] = []
 

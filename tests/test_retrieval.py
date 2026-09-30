@@ -79,3 +79,18 @@ def test_store_usable_from_another_thread(store):
     t.start()
     t.join()
     assert not errors
+
+
+def test_reranker_fit_recovers_the_informative_feature():
+    import numpy as np
+
+    from sanctions_rag.train_rerank import fit
+
+    rng = np.random.default_rng(0)
+    groups = []
+    for _ in range(60):
+        X = rng.random((20, 5))
+        y = int(np.argmax(X[:, 2]))  # only feature 2 identifies the relevant candidate
+        groups.append((X, y))
+    w = fit(groups)
+    assert int(np.argmax(w)) == 2

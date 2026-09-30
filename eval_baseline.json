@@ -1,4 +1,5 @@
 {
+  "primary": "hybrid+names+rerank",
   "overall": {
     "bm25": {
       "recall@1": 0.75,
@@ -31,7 +32,22 @@
       "recall@20": 0.933,
       "mrr@10": 0.808,
       "ndcg@10": 0.832
+    },
+    "names": {
+      "recall@1": 0.743,
+      "recall@5": 0.76,
+      "recall@10": 0.777,
+      "recall@20": 0.8,
+      "mrr@10": 0.751,
+      "ndcg@10": 0.757
+    },
+    "hybrid+names+rerank": {
+      "recall@1": 0.82,
+      "recall@5": 0.88,
+      "recall@10": 0.913,
+      "recall@20": 0.933,
+      "mrr@10": 0.849,
+      "ndcg@10": 0.864
     }
-  },
-  "note": "committed baseline; update deliberately in a PR"
+  }
 }

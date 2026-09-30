@@ -9,3 +9,5 @@ __pycache__/
 # Bulk data and build artefacts: regenerate with scripts/fetch_data.sh + ingest
 data/raw/*.jsonl
 data/sanctions.db
+data/cache/
+vault/

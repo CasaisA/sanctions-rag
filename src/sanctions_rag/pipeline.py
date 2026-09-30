@@ -7,6 +7,7 @@ from .bm25 import BM25
 from .embed import get_encoder
 from .graph import GraphExpander
 from .hybrid import HybridRetriever
+from .namematch import NameMatcher
 from .rerank import get_reranker
 from .store import Store
 from .vector import VectorIndex
@@ -27,8 +28,9 @@ class Pipeline:
         docs = [(e.id, e.search_text) for e in store.iter_entities()]
         bm25 = BM25().index(docs)
         vectors = VectorIndex(get_encoder()).index(docs)
-        hybrid = HybridRetriever(bm25, vectors)
-        return cls(store, bm25, vectors, hybrid, get_reranker(), GraphExpander(store))
+        names = NameMatcher().index(store.iter_entities())
+        hybrid = HybridRetriever(bm25, vectors, names=names)
+        return cls(store, bm25, vectors, hybrid, get_reranker(names, learned=True), GraphExpander(store))
 
     def search(self, query: str, k: int = 10, pool: int = 100,
                expand: bool = False, hops: int = 1) -> list[tuple[str, float]]:

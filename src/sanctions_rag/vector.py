@@ -19,7 +19,9 @@ class VectorIndex:
 
     def search(self, query: str, k: int = 50) -> list[tuple[str, float]]:
         assert self.matrix is not None, "index() first"
-        q = self.encoder.encode([query])[0]
+        # Asymmetric models embed queries with their own prompt.
+        encode_query = getattr(self.encoder, "encode_query", self.encoder.encode)
+        q = encode_query([query])[0]
         sims = self.matrix @ q
         if k >= len(sims):
             order = np.argsort(-sims)

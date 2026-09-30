@@ -10,6 +10,7 @@ from pathlib import Path
 from .bm25 import BM25
 from .embed import get_encoder
 from .hybrid import HybridRetriever
+from .namematch import NameMatcher
 from .rerank import get_reranker
 from .store import Store
 from .vector import VectorIndex
@@ -44,8 +45,15 @@ def run(db: str, queries_path: str, out_path: str | None = None, pool: int = 100
     vectors = VectorIndex(encoder).index(docs)
     t_vec = time.time() - t0
 
+    t0 = time.time()
+    names = NameMatcher().index(store.iter_entities())
+    t_names = time.time() - t0
+
     hybrid = HybridRetriever(bm25, vectors)
     reranker = get_reranker()
+
+    with_names = HybridRetriever(bm25, vectors, names=names)
+    name_reranker = get_reranker(names, learned=True)
 
     queries = [json.loads(l) for l in Path(queries_path).read_text(encoding="utf-8").splitlines() if l.strip()]
     systems = {
@@ -53,12 +61,14 @@ def run(db: str, queries_path: str, out_path: str | None = None, pool: int = 100
         "vector": lambda q: [d for d, _ in vectors.search(q, k=20)],
         "hybrid-rrf": lambda q: [d for d, _ in hybrid.search(q, k=20, pool=pool)],
         "hybrid+rerank": lambda q: [d for d, _ in reranker.rerank(q, hybrid.search(q, k=pool, pool=pool), store, k=20)],
+        "names": lambda q: [d for d, _ in names.search(q, k=20)],
+        "hybrid+names+rerank": lambda q: [d for d, _ in name_reranker.rerank(q, with_names.search(q, k=pool, pool=pool), store, k=20)],
     }
 
     results: dict = {"corpus": len(docs), "queries": len(queries),
                      "encoder": getattr(encoder, "info", None) and encoder.info.name,
                      "reranker": getattr(reranker, "name", "?"),
-                     "build_seconds": {"bm25": round(t_bm25, 1), "vector": round(t_vec, 1)},
+                     "build_seconds": {"bm25": round(t_bm25, 1), "vector": round(t_vec, 1), "names": round(t_names, 1)},
                      "overall": {}, "by_family": {}, "latency_ms": {}}
 
     for sys_name, fn in systems.items():

@@ -17,11 +17,15 @@ def rrf(runs: list[list[tuple[str, float]]], k: int = 60, top: int = 50,
 
 
 class HybridRetriever:
-    def __init__(self, bm25, vectors, weights=(1.0, 1.0), rrf_k: int = 60) -> None:
-        self.bm25, self.vectors = bm25, vectors
-        self.weights, self.rrf_k = list(weights), rrf_k
+    """Fuses BM25, dense vectors and, when given, the brute-force name matcher."""
+
+    def __init__(self, bm25, vectors, names=None, weights=None, rrf_k: int = 60) -> None:
+        self.bm25, self.vectors, self.names = bm25, vectors, names
+        self.weights = list(weights) if weights else None
+        self.rrf_k = rrf_k
 
     def search(self, query: str, k: int = 50, pool: int = 100) -> list[tuple[str, float]]:
-        lex = self.bm25.search(query, k=pool)
-        dense = self.vectors.search(query, k=pool)
-        return rrf([lex, dense], k=self.rrf_k, top=k, weights=self.weights)
+        runs = [self.bm25.search(query, k=pool), self.vectors.search(query, k=pool)]
+        if self.names is not None:
+            runs.append(self.names.search(query, k=pool))
+        return rrf(runs, k=self.rrf_k, top=k, weights=self.weights)

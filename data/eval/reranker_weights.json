@@ -1,0 +1,20 @@
+{
+  "features": [
+    "coverage",
+    "jaccard",
+    "name_similarity",
+    "topic",
+    "retriever_prior"
+  ],
+  "weights": {
+    "coverage": 0.4091,
+    "jaccard": 0.0275,
+    "name_similarity": 0.4211,
+    "topic": 0.0009,
+    "retriever_prior": 0.1413
+  },
+  "train_queries": 600,
+  "used": 573,
+  "not_in_pool": 27,
+  "held_out_entities": 109
+}

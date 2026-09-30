@@ -29,9 +29,10 @@ def check(results: dict, baseline: dict, tolerance: float = TOLERANCE) -> list[s
                 failures.append(f"{system}.{metric}: missing")
             elif actual < expected - tolerance:
                 failures.append(f"{system}.{metric}: {actual:.3f} < {expected:.3f} - {tolerance}")
-    best = results.get("overall", {}).get("hybrid+rerank", {})
+    primary = baseline.get("primary", "hybrid+rerank")
+    best = results.get("overall", {}).get(primary, {})
     if best.get("recall@10", 0) < max(r.get("recall@10", 0) for r in results.get("overall", {}).values()):
-        failures.append("hybrid+rerank is no longer the best system by recall@10")
+        failures.append(f"{primary} is no longer the best system by recall@10")
     return failures
 
 

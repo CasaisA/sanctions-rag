@@ -1,0 +1,188 @@
+{
+  "corpus": 19588,
+  "queries": 300,
+  "encoder": "BAAI/bge-small-en-v1.5",
+  "reranker": "feature-reranker",
+  "build_seconds": {
+    "bm25": 0.5,
+    "vector": 829.2
+  },
+  "overall": {
+    "bm25": {
+      "recall@1": 0.75,
+      "recall@5": 0.833,
+      "recall@10": 0.85,
+      "recall@20": 0.863,
+      "mrr@10": 0.782,
+      "ndcg@10": 0.798
+    },
+    "vector": {
+      "recall@1": 0.597,
+      "recall@5": 0.727,
+      "recall@10": 0.773,
+      "recall@20": 0.813,
+      "mrr@10": 0.648,
+      "ndcg@10": 0.678
+    },
+    "hybrid-rrf": {
+      "recall@1": 0.72,
+      "recall@5": 0.817,
+      "recall@10": 0.853,
+      "recall@20": 0.893,
+      "mrr@10": 0.761,
+      "ndcg@10": 0.783
+    },
+    "hybrid+rerank": {
+      "recall@1": 0.777,
+      "recall@5": 0.867,
+      "recall@10": 0.897,
+      "recall@20": 0.917,
+      "mrr@10": 0.817,
+      "ndcg@10": 0.836
+    }
+  },
+  "by_family": {
+    "alias": {
+      "bm25": {
+        "recall@1": 0.973,
+        "recall@5": 0.973,
+        "recall@10": 0.973,
+        "recall@20": 0.973,
+        "mrr@10": 0.973,
+        "ndcg@10": 0.973
+      },
+      "vector": {
+        "recall@1": 0.76,
+        "recall@5": 0.88,
+        "recall@10": 0.907,
+        "recall@20": 0.907,
+        "mrr@10": 0.811,
+        "ndcg@10": 0.834
+      },
+      "hybrid-rrf": {
+        "recall@1": 0.907,
+        "recall@5": 0.933,
+        "recall@10": 0.933,
+        "recall@20": 0.947,
+        "mrr@10": 0.914,
+        "ndcg@10": 0.919
+      },
+      "hybrid+rerank": {
+        "recall@1": 0.947,
+        "recall@5": 0.96,
+        "recall@10": 0.973,
+        "recall@20": 0.973,
+        "mrr@10": 0.955,
+        "ndcg@10": 0.959
+      }
+    },
+    "partial": {
+      "bm25": {
+        "recall@1": 0.547,
+        "recall@5": 0.707,
+        "recall@10": 0.747,
+        "recall@20": 0.8,
+        "mrr@10": 0.604,
+        "ndcg@10": 0.638
+      },
+      "vector": {
+        "recall@1": 0.28,
+        "recall@5": 0.48,
+        "recall@10": 0.547,
+        "recall@20": 0.653,
+        "mrr@10": 0.35,
+        "ndcg@10": 0.396
+      },
+      "hybrid-rrf": {
+        "recall@1": 0.48,
+        "recall@5": 0.653,
+        "recall@10": 0.707,
+        "recall@20": 0.787,
+        "mrr@10": 0.548,
+        "ndcg@10": 0.586
+      },
+      "hybrid+rerank": {
+        "recall@1": 0.52,
+        "recall@5": 0.68,
+        "recall@10": 0.773,
+        "recall@20": 0.853,
+        "mrr@10": 0.584,
+        "ndcg@10": 0.628
+      }
+    },
+    "attribute": {
+      "bm25": {
+        "recall@1": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "recall@20": 1.0,
+        "mrr@10": 1.0,
+        "ndcg@10": 1.0
+      },
+      "vector": {
+        "recall@1": 0.933,
+        "recall@5": 0.947,
+        "recall@10": 0.947,
+        "recall@20": 0.96,
+        "mrr@10": 0.937,
+        "ndcg@10": 0.939
+      },
+      "hybrid-rrf": {
+        "recall@1": 0.947,
+        "recall@5": 0.987,
+        "recall@10": 1.0,
+        "recall@20": 1.0,
+        "mrr@10": 0.962,
+        "ndcg@10": 0.971
+      },
+      "hybrid+rerank": {
+        "recall@1": 1.0,
+        "recall@5": 1.0,
+        "recall@10": 1.0,
+        "recall@20": 1.0,
+        "mrr@10": 1.0,
+        "ndcg@10": 1.0
+      }
+    },
+    "noisy": {
+      "bm25": {
+        "recall@1": 0.48,
+        "recall@5": 0.653,
+        "recall@10": 0.68,
+        "recall@20": 0.68,
+        "mrr@10": 0.55,
+        "ndcg@10": 0.582
+      },
+      "vector": {
+        "recall@1": 0.413,
+        "recall@5": 0.6,
+        "recall@10": 0.693,
+        "recall@20": 0.733,
+        "mrr@10": 0.497,
+        "ndcg@10": 0.544
+      },
+      "hybrid-rrf": {
+        "recall@1": 0.547,
+        "recall@5": 0.693,
+        "recall@10": 0.773,
+        "recall@20": 0.84,
+        "mrr@10": 0.62,
+        "ndcg@10": 0.656
+      },
+      "hybrid+rerank": {
+        "recall@1": 0.64,
+        "recall@5": 0.827,
+        "recall@10": 0.84,
+        "recall@20": 0.84,
+        "mrr@10": 0.729,
+        "ndcg@10": 0.757
+      }
+    }
+  },
+  "latency_ms": {
+    "bm25": 1.5,
+    "vector": 4.2,
+    "hybrid-rrf": 5.3,
+    "hybrid+rerank": 11.9
+  }
+}

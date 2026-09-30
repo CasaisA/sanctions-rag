@@ -48,6 +48,7 @@ class AskRequest(BaseModel):
 
 class InvestigateRequest(AskRequest):
     max_iterations: int = Field(default=3, ge=1, le=6)
+    engine: str = Field(default="rules", pattern="^(rules|claude)$")
 
 
 @app.middleware("http")
@@ -112,6 +113,10 @@ def ask(req: AskRequest) -> dict[str, Any]:
 @app.post("/investigate")
 def investigate_endpoint(req: InvestigateRequest) -> dict[str, Any]:
     p = get_pipeline()
+    if req.engine == "claude":
+        from .claude_agent import investigate as claude_investigate
+
+        return claude_investigate(p, req.question).as_dict()
     return investigate(p, req.question, max_iterations=req.max_iterations,
                        k=req.k, expand=req.expand).as_dict()
 

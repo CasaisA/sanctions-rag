@@ -102,9 +102,6 @@ class Adjudicator:
         return hashlib.sha1(f"{self.model}|{self.effort}|{SYSTEM}|{prompt}".encode()).hexdigest()
 
     async def judge(self, query: str, candidate_ids: list[str]) -> Decision:
-        from claude_agent_sdk import ClaudeAgentOptions, ResultMessage
-        from claude_agent_sdk import query as sdk_query
-
         ents = [e for e in (self.store.get(i) for i in candidate_ids) if e is not None]
         if not ents:
             return Decision(None, "high", "no candidates")
@@ -113,6 +110,10 @@ class Adjudicator:
         if key in self.cache:
             row = self.cache[key]
             return Decision(row["match_id"], row["confidence"], row["reason"], cached=True)
+
+        # Imported here so re-scoring from cached decisions works without the SDK installed.
+        from claude_agent_sdk import ClaudeAgentOptions, ResultMessage
+        from claude_agent_sdk import query as sdk_query
 
         options = ClaudeAgentOptions(system_prompt=SYSTEM, tools=[], setting_sources=[],
                                      max_turns=3, model=self.model, effort=self.effort,
